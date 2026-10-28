@@ -42,9 +42,13 @@ class Groupement
     #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'groupement', cascade: ['persist'], orphanRemoval: true)]
     private Collection $exercices;
 
+    #[ORM\OneToMany(targetEntity: Membre::class, mappedBy: 'groupement')]
+    private Collection $membres;
+
     public function __construct()
     {
         $this->exercices = new ArrayCollection();
+        $this->membres = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -120,6 +124,32 @@ class Groupement
         if ($this->exercices->removeElement($exercice)) {
             if ($exercice->getGroupement() === $this) {
                 $exercice->setGroupement(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getMembres(): Collection
+    {
+        return $this->membres;
+    }
+
+    public function addMembre(Membre $membre): static
+    {
+        if (!$this->membres->contains($membre)) {
+            $this->membres->add($membre);
+            $membre->setGroupement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMembre(Membre $membre): static
+    {
+        if ($this->membres->removeElement($membre)) {
+            if ($membre->getGroupement() === $this) {
+                $membre->setGroupement(null);
             }
         }
 
