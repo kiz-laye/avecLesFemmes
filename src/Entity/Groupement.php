@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\GroupementRepository;
 use App\Trait\DateTimeTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -36,6 +38,14 @@ class Groupement
 
     #[ORM\Column]
     private bool $isActive = true;
+
+    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'groupement', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $exercices;
+
+    public function __construct()
+    {
+        $this->exercices = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -86,6 +96,32 @@ class Groupement
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getExercices(): Collection
+    {
+        return $this->exercices;
+    }
+
+    public function addExercice(Exercice $exercice): static
+    {
+        if (!$this->exercices->contains($exercice)) {
+            $this->exercices->add($exercice);
+            $exercice->setGroupement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExercice(Exercice $exercice): static
+    {
+        if ($this->exercices->removeElement($exercice)) {
+            if ($exercice->getGroupement() === $this) {
+                $exercice->setGroupement(null);
+            }
+        }
 
         return $this;
     }
