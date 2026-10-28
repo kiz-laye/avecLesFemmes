@@ -3,14 +3,18 @@
 namespace App\Entity;
 
 use App\Repository\RoleRepository;
+use App\Trait\DateTimeTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RoleRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['nom'], message: 'Ce rôle existe déjà.')]
 class Role
 {
+    use DateTimeTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
